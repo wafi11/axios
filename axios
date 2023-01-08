@@ -1,0 +1,68 @@
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import './App.css';
+import List from './list';
+
+function App() {
+  const url = "http://localhost:1104/products"
+  const [data, setData] = useState([])
+
+  useEffect(() => {
+    const axiosData = async () => {
+      try {
+        const { data: response } = await axios.get(url)
+        setData(response)
+        console.log(response);
+      } catch (error) {
+        console.log("error jancok")
+      }
+    }
+    axiosData()
+  }, [])
+
+  const addData = async (date) => {
+    const tambah = {"name" : "wafiq" , "age" : 22}
+    await axios.post(url,tambah)
+    setData([tambah,...data])
+  }
+
+  const handleUpdate = async (item) => {
+    item.name = "update telah dilakukan"
+    item.age = 20
+    await axios.put(url + '/' + item.id)
+    const dataClone = [...data]
+    const index = dataClone.indexOf(item)
+    dataClone[index] = { ...item }
+    setData(dataClone)
+  }
+
+  const deleteProduct = async (item) => {
+    await axios.delete(url + '/' + item.id)
+    setData(data.filter((e) => e.id !== item.id))
+    console.log(item);
+  }
+  return (
+    <div className="App">
+        <div>
+          <h2>datamu Cokkk!!!!!</h2>
+          <ul>
+            {
+              data.map((set, index) => (
+                <div key={index}>
+                  <li> nama anda : {set.name}</li>
+                  <p> umur anda : {set.age}</p>
+                  <button onClick={() => handleUpdate(set)} >update</button>
+                  <button onClick={() => deleteProduct(set)} >-</button>
+                  <button onClick={addData} >+</button>
+
+                </div>
+              ))
+            }
+          </ul>
+         
+        </div>
+    </div>
+  );
+}
+
+export default App;
